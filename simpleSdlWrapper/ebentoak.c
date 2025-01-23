@@ -19,29 +19,20 @@ int ebentuaJasoGertatuBada(void)
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
-            case SDLK_LEFT:
+            case SDLK_a:
                 ret = TECLA_LEFT;
                 break;
-            case SDLK_RIGHT:
+            case SDLK_d:
                 ret = TECLA_RIGHT;
                 break;
-            case SDLK_DOWN:
+            case SDLK_s:
                 ret = TECLA_DOWN;
                 break;
-            case SDLK_UP:
+            case SDLK_w:
                 ret = TECLA_UP;
-                break;
-            case SDLK_SPACE:
-                ret = TECLA_SPACE;
-                break;
-            case SDLK_r:
-                ret = TECLA_r;
                 break;
             case SDLK_e:
                 ret = TECLA_e;
-                break;
-            case SDLK_v:
-                ret = TECLA_v;
                 break;
             case SDLK_1:
                 ret = TECLA_1;
@@ -69,16 +60,16 @@ int ebentuaJasoGertatuBada(void)
         case SDL_KEYUP:
             switch (event.key.keysym.sym)
             {
-            case SDLK_LEFT:
+            case SDLK_a:
                 ret = TECLA_LEFT_UP;
                 break;
-            case SDLK_RIGHT:
+            case SDLK_d:
                 ret = TECLA_RIGHT_UP;
                 break;
-            case SDLK_DOWN:
+            case SDLK_s:
                 ret = TECLA_DOWN_UP;
                 break;
-            case SDLK_UP:
+            case SDLK_w:
                 ret = TECLA_UP_UP;
                 break;
             case SDLK_ESCAPE:

@@ -6,10 +6,7 @@
 #include "text.h"
 #include <stdio.h>
 
-#define JOKOA_SOUND_WIN "./sound/BugleCall.wav"
-#define JOKOA_SOUND_LOOSE "./sound/terminator.wav"
-#define BUKAERA_SOUND_1 "./sound/128NIGHT_01.wav"
-#define BUKAERA_IMAGE "./img/gameOver.bmp"
+#define _CRT_SECURE_NO_WARNINGS
 
 void jokoaAurkeztu(void);
 partidako_data jokatu(partidako_data partida);
@@ -17,34 +14,88 @@ int uploadFrame(JOKO_ELEMENTUA *elem);
 
 void jokoaAurkeztu(void)
 {
-    int ebentu = 0, idfondo, idboton;
+    int ebentu = 0, idfondo, idboton, idboton2, hasi = 1;
     POSIZIOA sagua;
-    SDL_Event event;
 
     pantailaGarbitu();
     idfondo = irudiaKargatu("./img/Menu.bmp");
     idboton = irudiaKargatu("./img/Hasi.bmp");
+    idboton2 = irudiaKargatu("./img/hasi_handia.bmp");
     irudiaMugitu(idboton, 400, 400);
-    irudiakMarraztuMapa();
-    pantailaBerriztu();
-    do
+    irudiaMugitu(idboton2, -400, -400);
+    while (hasi == 1)
     {
-        while (SDL_PollEvent(&event))
+        pantailaBerriztu();
+        irudiakMarraztuMapa();
+        irudiaMugitu(idboton2, -400, -400);
+        ebentu = ebentuaJasoGertatuBada();
+        sagua = saguarenPosizioa();
+        if (sagua.x > 400 && sagua.x < 600 && sagua.y > 400 && sagua.y < 460)
         {
-            if (event.type == SDL_MOUSEMOTION)
+            irudiaMugitu(idboton2, 375, 385);
+            if (ebentu == SAGU_BOTOIA_EZKERRA)
             {
-                sagua.x = event.button.x;
-                sagua.y = event.button.y;
+                hasi = 0;
             }
         }
-        if (sagua.x >= 400 && sagua.x <= 600 && sagua.y >= 400 && sagua.y <= 500)
-        {
-            ebentu = ebentuaJasoGertatuBada();
-            saguarenPosizioa();
-        }
-    } while (ebentu != SAGU_BOTOIA_EZKERRA);
+    }
     irudiaKendu(idfondo);
     irudiaKendu(idboton);
+    irudiaKendu(idboton2);
+}
+
+void jokoaBukatu(partidako_data partida)
+{
+    int ebentu = 0, idfondo, idboton, idboton2, hasi = 1,k=0,l=0,i;
+    char j1[8],k1[8],l1[8];
+    for (i = 1; i < 41; i++)
+    {
+        if (partida.objetuak[i]==1)
+        {
+            k++;
+        }
+    }
+    sprintf(j1,"%d",partida.zaborra);
+    sprintf(k1,"%d",k);
+    sprintf(l1,"%d",l);
+    POSIZIOA sagua;
+
+    pantailaGarbitu();
+    idfondo = irudiaKargatu("./img/menu_final.bmp");
+    idboton = irudiaKargatu("./img/atera.bmp");
+    idboton2 = irudiaKargatu("./img/atera_grande.bmp");
+    irudiaMugitu(idboton, 150, 550);
+    irudiaMugitu(idboton2, -400, -400);
+    while (hasi == 1)
+    {
+        textuaIdatzi(560,510,"Arrantzatutako zaborra");
+        textuaIdatzi(560,570,"Jasotako zaborra");
+        textuaIdatzi(560,630,"Itzalitako zuhaitzak");
+        textuaIdatzi(860,510,j1);
+        textuaIdatzi(860,570,k1);
+        textuaIdatzi(860,630,l1);
+        pantailaBerriztu();
+        irudiakMarraztuMapa();
+        irudiaMugitu(idboton2, -400, -400);
+        ebentu = ebentuaJasoGertatuBada();
+        sagua = saguarenPosizioa();
+        if (sagua.x > 150 && sagua.x < 450 && sagua.y > 550 && sagua.y < 630)
+        {
+            irudiaMugitu(idboton2, 138, 546);
+            if (ebentu == SAGU_BOTOIA_EZKERRA)
+            {
+                hasi = 0;
+            }
+        }
+        if (ebentu==TECLA_ESCAPE)
+        {
+            hasi=0;
+        }
+        
+    }
+    irudiaKendu(idfondo);
+    irudiaKendu(idboton);
+    irudiaKendu(idboton2);
 }
 
 int uploadFrame(JOKO_ELEMENTUA *elem)
@@ -57,11 +108,9 @@ int uploadFrame(JOKO_ELEMENTUA *elem)
 partidako_data jokatu(partidako_data partida)
 {
     nibela mapa;
-    POSIZIOA abiadura;
-    abiadura.x = 0;
-    abiadura.y = 0;
     POSIZIOA pantaila;
-    int ebentu = 0, i, egoera, txokea, zaborra = 0;
+    int ebentu = 0, i, j, egoera, pausa, txokea, zaborra = 0;
+    GLOBOAK globoak;
 
     arkatzKoloreaEzarri(0, 0, 255);
 
@@ -78,50 +127,82 @@ partidako_data jokatu(partidako_data partida)
     Uint32 lastAnimationTimer = 0;
     Uint32 tiempoActual = SDL_GetTicks();
     pantaila = pantailaEgokitu(partida, mapa.limiteak);
-    switch (mapa.elementuak[mapa.kantitatea - 1].irudia)
-    {
-    case 100:
-        mapa.elementuak[mapa.kantitatea - 1].id = irudiaKargatu("./img/fondo_1.bmp");
-        break;
-    case 101:
-        mapa.elementuak[mapa.kantitatea - 1].id = irudiaKargatu("./img/fondo_2.bmp");
-        break;
-    case 102:
-        mapa.elementuak[mapa.kantitatea - 1].id = irudiaKargatu("./img/fondo_3.bmp");
-        break;
-    case 103:
-        mapa.elementuak[mapa.kantitatea - 1].id = irudiaKargatu("./img/Rio.bmp");
-        break;
-    default:
-        break;
-    }
+    mapa.elementuak[mapa.kantitatea - 1].id = fondoaKargatu(mapa.elementuak[mapa.kantitatea - 1].irudia);
     for (i = 1; i < mapa.kantitatea; i++)
     {
         switch (mapa.elementuak[i].irudia)
         {
-        case 0:
-            mapa.elementuak[i].id = irudiaKargatu("./img/pertsonaia.bmp");
+        case 5:
+            mapa.elementuak[i].id = irudiaKargatu("./img/kanaberaX2.bmp");
             break;
+        case 19:
+            mapa.elementuak[i].id = irudiaKargatu("./img/bolsa_gris.bmp");
+            break;
+        case 20:
+            mapa.elementuak[i].id = irudiaKargatu("./img/bolsa_amarilla.bmp");
+            break;
+        case 21:
+            mapa.elementuak[i].id = irudiaKargatu("./img/jager.bmp");
+            break;
+        case 22:
+            mapa.elementuak[i].id = irudiaKargatu("./img/licor.bmp");
+            break;
+        case 23:
+            mapa.elementuak[i].id = irudiaKargatu("./img/cocacola.bmp");
+            break;
+        case 24:
+            mapa.elementuak[i].id = irudiaKargatu("./img/cigarros.bmp");
+            break;
+        case 103:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_1.bmp");
+            break;
+        case 104:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_2.bmp");
+            break;
+        case 105:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_3.bmp");
+            break;
+        case 106:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_4.bmp");
+            break;
+        case 107:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_5.bmp");
+            break;
+        case 108:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_futbol.bmp");
+            break;
+        case 109:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_6.bmp");
+            break;
+        case 110:
+            mapa.elementuak[i].id = irudiaKargatu("./img/suelo_7.bmp");
+            break;
+        default:
+            break;
+        }
+    }
+    mapa.elementuak[0].id = irudiaKargatu("./img/pertsonaia.bmp");
+    for (i = 1; i < mapa.kantitatea; i++)
+    {
+        switch (mapa.elementuak[i].irudia)
+        {
         case 1:
-            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_arriba.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_1.bmp");
             break;
         case 2:
-            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_4.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_2.bmp");
             break;
         case 3:
-            mapa.elementuak[i].id = irudiaKargatu("./img/obstaculo_3.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/rio_1.bmp");
             break;
         case 4:
             mapa.elementuak[i].id = irudiaKargatu("./img/coche.bmp");
             break;
-        case 5:
-            mapa.elementuak[i].id = irudiaKargatu("./img/kanabera.bmp");
-            break;
         case 6:
-            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_3.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_5.bmp");
             break;
         case 7:
-            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_2.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_4.bmp");
             break;
         case 8:
             mapa.elementuak[i].id = irudiaKargatu("./img/arbusto.bmp");
@@ -145,34 +226,49 @@ partidako_data jokatu(partidako_data partida)
             mapa.elementuak[i].id = irudiaKargatu("./img/columpio.bmp");
             break;
         case 15:
-            mapa.elementuak[i].id = irudiaKargatu("./img/atea_1.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/tobogan.bmp");
             break;
         case 16:
             mapa.elementuak[i].id = irudiaKargatu("./img/fuente.bmp");
             break;
         case 17:
-            mapa.elementuak[i].id = irudiaKargatu("./img/obstaculo_14.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_1.bmp");
             break;
         case 18:
-            mapa.elementuak[i].id = irudiaKargatu("./img/lurra_4.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_3.bmp");
             break;
-        case 19:
-            mapa.elementuak[i].id = irudiaKargatu("./img/bolsa_gris.bmp");
+        case 25:
+            mapa.elementuak[i].id = irudiaKargatu("./img/arbol_quemado_1.bmp");
             break;
-        case 20:
-            mapa.elementuak[i].id = irudiaKargatu("./img/bolsa_amarilla.bmp");
+        case 26:
+            mapa.elementuak[i].id = irudiaKargatu("./img/arbol_quemado_2.bmp");
             break;
-        case 21:
-            mapa.elementuak[i].id = irudiaKargatu("./img/jager.bmp");
+        case 27:
+            mapa.elementuak[i].id = irudiaKargatu("./img/tronco_quemado.bmp");
             break;
-        case 22:
-            mapa.elementuak[i].id = irudiaKargatu("./img/licor.bmp");
+        case 28:
+            mapa.elementuak[i].id = irudiaKargatu("./img/tronco_quemandose.bmp");
             break;
-        case 23:
-            mapa.elementuak[i].id = irudiaKargatu("./img/cocacola.bmp");
+        case 29:
+            mapa.elementuak[i].id = irudiaKargatu("./img/rio_2.bmp");
             break;
-        case 24:
+        case 30:
             mapa.elementuak[i].id = irudiaKargatu("./img/cigarros.bmp");
+            break;
+        case 31:
+            mapa.elementuak[i].id = irudiaKargatu("./img/cubo.bmp");
+            break;
+        case 32:
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_quemandose_3.bmp");
+            break;
+        case 33:
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_quemandose_1.bmp");
+            break;
+        case 34:
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_quemandose_2.bmp");
+            break;
+        case 35:
+            mapa.elementuak[i].id = irudiaKargatu("./img/arboles_quemandose_2.bmp");
             break;
         case 36:
             mapa.elementuak[i].id = irudiaKargatu("./img/estitxu.bmp");
@@ -192,41 +288,37 @@ partidako_data jokatu(partidako_data partida)
         case 41:
             mapa.elementuak[i].id = irudiaKargatu("./img/pez.bmp");
             break;
-
         default:
             break;
         }
     }
-    mapa.elementuak[0].id = irudiaKargatu("./img/pertsonaia.bmp");
-    partida.invent.argazkiak[0] = irudiaKargatu("./img/inventario.bmp");
-    partida.invent.argazkiak[1] = irudiaKargatu("./img/casilla.bmp");
-    partida.invent.argazkiak[2] = irudiaKargatu("./img/casilla.bmp");
-    partida.invent.argazkiak[3] = irudiaKargatu("./img/casilla.bmp");
-    partida.invent.argazkiak[4] = irudiaKargatu("./img/casilla.bmp");
-    partida.invent.argazkiak[5] = irudiaKargatu("./img/casilla.bmp");
-    partida.invent.argazkiak[6] = irudiaKargatu("./img/casilla.bmp");
+
+    globoak = globoakKargatu();
+    pausa = irudiaKargatu("./img/pausa.bmp");
+    if (pausa==-1)
+    {
+        irudiaKendu(pausa);
+        pausa = irudiaKargatu("./img/pausa.bmp");
+    } 
+    irudiaMugitu(pausa, -1000, -1000);
+    partida = inbentarioaKargatu(partida);
+
     if (partida.nibel == 4)
     {
         mapa.elementuak[0].norabidea = 4;
     }
+
     do
     {
         SDL_Delay(10);
-        pantailaKargatu(mapa, pantaila);
+        pantailaKargatu(mapa, pantaila, globoak);
         interfazaKargatu(partida.invent);
         ebentu = ebentuaJasoGertatuBada();
         switch (ebentu)
         {
         case TECLA_LEFT:
-            abiadura.x = -5;
-            if (partida.nibel == 4)
-            {
-                mapa.elementuak[0].norabidea = 4;
-            }
-            else
-            {
-                mapa.elementuak[0].norabidea = 2;
-            }
+            partida.abiadura.x = -5;
+            mapa.elementuak[0].norabidea = (partida.nibel == 4) ? 4 : 2;
 
             // Obtener el tiempo actual
             tiempoActual = SDL_GetTicks();
@@ -239,15 +331,8 @@ partidako_data jokatu(partidako_data partida)
             }
             break;
         case TECLA_RIGHT:
-            abiadura.x = 5;
-            if (partida.nibel == 4)
-            {
-                mapa.elementuak[0].norabidea = 4;
-            }
-            else
-            {
-                mapa.elementuak[0].norabidea = 3;
-            }
+            partida.abiadura.x = 5;
+            mapa.elementuak[0].norabidea = (partida.nibel == 4) ? 4 : 3;
 
             tiempoActual = SDL_GetTicks();
             if (tiempoActual - lastAnimationTimer >= 100)
@@ -257,15 +342,8 @@ partidako_data jokatu(partidako_data partida)
             }
             break;
         case TECLA_UP:
-            abiadura.y = -5;
-            if (partida.nibel == 4)
-            {
-                mapa.elementuak[0].norabidea = 4;
-            }
-            else
-            {
-                mapa.elementuak[0].norabidea = 0;
-            }
+            partida.abiadura.y = -5;
+            mapa.elementuak[0].norabidea = (partida.nibel == 4) ? 4 : 0;
 
             tiempoActual = SDL_GetTicks();
             if (tiempoActual - lastAnimationTimer >= 100)
@@ -275,15 +353,8 @@ partidako_data jokatu(partidako_data partida)
             }
             break;
         case TECLA_DOWN:
-            abiadura.y = 5;
-            if (partida.nibel == 4)
-            {
-                mapa.elementuak[0].norabidea = 4;
-            }
-            else
-            {
-                mapa.elementuak[0].norabidea = 1;
-            }
+            partida.abiadura.y = 5;
+            mapa.elementuak[0].norabidea = (partida.nibel == 4) ? 4 : 1;
 
             tiempoActual = SDL_GetTicks();
             if (tiempoActual - lastAnimationTimer >= 100)
@@ -293,45 +364,25 @@ partidako_data jokatu(partidako_data partida)
             }
             break;
         case TECLA_LEFT_UP:
-            abiadura.x = 0;
-            if (partida.nibel == 0)
-            {
-                mapa.elementuak[0].irudi_data.frame = 0;
-            }
+            partida.abiadura.x = 0;
+            mapa.elementuak[0].irudi_data.frame = 0;
             break;
         case TECLA_RIGHT_UP:
-            abiadura.x = 0;
+            partida.abiadura.x = 0;
             mapa.elementuak[0].irudi_data.frame = 0;
             break;
         case TECLA_UP_UP:
-            abiadura.y = 0;
+            partida.abiadura.y = 0;
             mapa.elementuak[0].irudi_data.frame = 0;
             break;
         case TECLA_DOWN_UP:
-            abiadura.y = 0;
+            partida.abiadura.y = 0;
             mapa.elementuak[0].irudi_data.frame = 0;
-            break;
-        case TECLA_SPACE:
-            partida.nibel = 4;
-            break;
-        case TECLA_v:
-            partida.nibel = 0;
-            break;
-        case TECLA_r:
-            partida.nibel = 90;
             break;
         case TECLA_e:
             // si hay dos objetos al alcance, recoge ambos a la vez
-            for (i = 0; i < mapa.kantitatea; i++)
-            {
-                txokea = txokatuAlDira(mapa.elementuak[0], mapa.elementuak[i]);
-                if (mapa.elementuak[i].mota == OBJETUA && txokea == 1)
-                {
-                    mapa.elementuak[i] = irudiaKanporatu(mapa.elementuak[i]);
-                    irudiaMugitu(mapa.elementuak[i].id, mapa.elementuak[i].pos.x, mapa.elementuak[i].pos.y);
-                    break;
-                }
-            }
+            partida = objetuak(partida, mapa);
+            mapa = objetuakKanporatu(partida, mapa);
             break;
         case TECLA_1:
             partida.invent.posizioa = 0;
@@ -349,28 +400,37 @@ partidako_data jokatu(partidako_data partida)
             partida.invent.posizioa = 4;
             break;
         case TECLA_ESCAPE:
-            pausaBotoia();
+            irudiaMugitu(pausa, 150, 150);
+            pantailaKargatu(mapa, pantaila, globoak);
+            pausaBotoia(pausa);
+            irudiaMugitu(pausa, -1000, -1000);
+            pantailaKargatu(mapa, pantaila, globoak);
             break;
+         case SAGU_BOTOIA_EZKERRA:
+             if (partida.invent.objetuak[partida.invent.posizioa] == UR_GLOBOA)
+             {
+                 globoak = globoaBota(globoak, mapa.elementuak[0], pantaila);
+             }
+             else if (partida.invent.objetuak[partida.invent.posizioa] == KANABERA)
+             {
+                 if (partida.nibel==0&&mapa.elementuak[0].pos.y>1820)
+                 {
+                     partida.nibel=4;
+                     partida.jokalaria.x=475;
+                     partida.jokalaria.y=0;
+                 }
+             }
+             break;
         default:
             break;
         }
-        for (i = 0; i < mapa.kantitatea; i++)
-        {
-            if (mapa.elementuak[i].mota == KOLISIOA)
-            {
-                abiadura = txokatuAlDiraKolisioa(mapa.elementuak[0], mapa.elementuak[i], abiadura);
-            }
-            txokea = txokatuAlDira(mapa.elementuak[0], mapa.elementuak[i]);
-            if (mapa.elementuak[i].mota == EREMUA && txokea == 1)
-            {
-                partida = eremuaEgin(partida, mapa.elementuak[i].eremu_id, mapa.elementuak[0]);
-            }
-        }
-        // logika 4. nibela
+
+        partida = kolisioak(partida, mapa);
+
         if (partida.nibel == 4)
         {
             // mapatik ez ateratzeko
-            abiadura = paretakinTalka(mapa.elementuak[0], abiadura);
+            partida.abiadura = paretakinTalka(mapa.elementuak[0], partida.abiadura);
             for (i = 0; i < mapa.kantitatea; i++)
             {
                 tiempoActual = SDL_GetTicks();
@@ -411,9 +471,9 @@ partidako_data jokatu(partidako_data partida)
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[0] = mapa.elementuak[0].pos.x - 50;
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[1] = mapa.elementuak[0].pos.y + 20 + 20;
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[2] =
-                    mapa.elementuak[0].pos.x - 50 + 150; // 150 = ancho imagen
+                mapa.elementuak[0].pos.x - 50 + 150; // 150 = ancho imagen
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[3] =
-                    mapa.elementuak[0].pos.y + 20 + 100 + 20; // 100 = alto imagen
+                mapa.elementuak[0].pos.y + 20 + 100 + 20; // 100 = alto imagen
 
                 if (mapa.elementuak[0].pos.y < 0)
                 {
@@ -426,6 +486,7 @@ partidako_data jokatu(partidako_data partida)
                     mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[3] = 9999;
                     mapa.elementuak[0].hartuId = -1;
                     zaborra++;
+                    partida.zaborra++;
                 }
             }
         }
@@ -433,24 +494,41 @@ partidako_data jokatu(partidako_data partida)
         {
             mapa.elementuak[0].hartuId = -1;
         }
-
-        pantaila = pantailaMugitu(pantaila, mapa.limiteak, mapa.elementuak[0].pos, abiadura);
-        mapa.elementuak[0] = jokalariaMugitu(mapa.elementuak[0], abiadura);
-
-        // si se recoge toda la basura sale del nivel 4
-        if (zaborra >= 10 && partida.nibel == 4)
+        if (zaborra==10)
         {
-            partida.nibel = 0;
-            partida.jokalaria.x = 475;
-            partida.jokalaria.y = 1700;
-            mapa.elementuak[i].norabidea = 0;
+            partida.nibel=0;
+            partida.jokalaria.x=475;
+            partida.jokalaria.y=1820;
         }
+        
+
+        pantaila = pantailaMugitu(pantaila, mapa.limiteak, mapa.elementuak[0].pos, partida.abiadura);
+        globoak = globoakMugitu(globoak);
+        for (i = 0; i < 10; i++)
+        {
+            for (j = 0; j < mapa.kantitatea; j++)
+            {
+                if (mapa.elementuak[j].mota == KOLISIOA)
+                {
+                    if (mapa.elementuak[j].hitbox[0] < globoak.posizioa[i].x + 14 &&
+                        mapa.elementuak[j].hitbox[1] < globoak.posizioa[i].y + 18 &&
+                        mapa.elementuak[j].hitbox[2] > globoak.posizioa[i].x &&
+                        mapa.elementuak[j].hitbox[3] > globoak.posizioa[i].y)
+                    {
+                        globoak.posizioa[i].x = -2000;
+                        globoak.posizioa[i].y = -2000;
+                        globoak.abiadura[i].x = 0;
+                        globoak.abiadura[i].y = 0;
+                    }
+                }
+            }
+        }
+
+        mapa.elementuak[0] = jokalariaMugitu(mapa.elementuak[0], partida.abiadura);
 
     } while (egoera == partida.nibel);
 
-    for (i = 0; i < mapa.kantitatea; i++)
-    {
-        irudiaKendu(mapa.elementuak[i].id);
-    }
+    irudiakKendu(mapa);
+    irudiaKendu(pausa);
     return partida;
 }

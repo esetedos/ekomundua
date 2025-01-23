@@ -1,7 +1,7 @@
 #ifndef IMAGEN_H
 #define IMAGEN_H
 
-#define MAX_IMG 150
+#define MAX_IMG 1500
 #include "data.h"
 #include "ebentoak.h"
 #include "graphics.h"

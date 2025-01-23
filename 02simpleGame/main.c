@@ -21,10 +21,11 @@ int main(int argc, char *str[])
     jokoaAurkeztu();
     loadTheMusic("./sound/gameMusic.wav");
     toggleMusic();
-    while (partida.nibel < 40)
+    while (partida.nibel < 6)
     {
         partida = jokatu(partida);
     }
+    jokoaBukatu(partida);
     sgItxi();
     return 0;
 }

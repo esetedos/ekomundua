@@ -4,9 +4,10 @@
 #include "imagen.h"
 #include "soinua.h"
 #include "text.h"
+#include <math.h>
 #include <stdio.h>
 
-int pantailaKargatu(nibela mapa, POSIZIOA pantaila)
+int pantailaKargatu(nibela mapa, POSIZIOA pantaila, GLOBOAK globoak)
 {
     int i;
     pantailaGarbitu();
@@ -15,22 +16,373 @@ int pantailaKargatu(nibela mapa, POSIZIOA pantaila)
         irudiaMugitu(mapa.elementuak[i].id, mapa.elementuak[i].pos.x - pantaila.x,
                      mapa.elementuak[i].pos.y - pantaila.y);
     }
+    for (i = 0; i < 10; i++)
+    {
+        irudiaMugitu(globoak.id[i],globoak.posizioa[i].x- pantaila.x,globoak.posizioa[i].y- pantaila.y);
+    }
+    
     // int frame, int margen, int width, int height, int jokalariarenNorabidea)
     irudiakMarraztu(mapa);
-    for (i = 0; i < mapa.kantitatea; i++)
-    {
-        karratuaMarraztu(mapa.elementuak[i].hitbox[0] - pantaila.x, mapa.elementuak[i].hitbox[1] - pantaila.y,
-                         mapa.elementuak[i].hitbox[2] - pantaila.x, mapa.elementuak[i].hitbox[3] - pantaila.y);
-    }
     pantailaBerriztu();
     return 0;
 }
 
+GLOBOAK globoakMugitu(GLOBOAK globoak)
+{   
+    int i;
+    for (i = 0; i < 10; i++)
+    {
+        globoak.posizioa[i].x+=globoak.abiadura[i].x;
+        globoak.posizioa[i].y+=globoak.abiadura[i].y;
+    }
+    
+    return globoak;
+}
+
+int fondoaKargatu(int irudia)
+{
+    int id;
+    switch (irudia)
+    {
+    case 100:
+        id = irudiaKargatu("./img/fondo_1.bmp");
+        break;
+    case 101:
+        id = irudiaKargatu("./img/fondo_2.bmp");
+        break;
+    case 102:
+        id = irudiaKargatu("./img/fondo_3.bmp");
+        break;
+    case 111:
+        id = irudiaKargatu("./img/Rio.bmp");
+        break;
+    default:
+        break;
+    return id;
+    }
+}
+
+int paretakinTalkaEskubi(JOKO_ELEMENTUA jokalaria)
+{
+    int hitbox[4], k = 0;
+    // derecha
+    hitbox[0] = 1000;
+    hitbox[1] = 0;
+    hitbox[2] = 1100;
+    hitbox[3] = 700;
+
+    if (jokalaria.hitbox[0] < hitbox[2] && // Izquierda de jokalaria está dentro del rango horizontal de kolisioa
+        jokalaria.hitbox[0] > hitbox[0] && // Izquierda de jokalaria no está fuera por la izquierda de kolisioa
+        jokalaria.hitbox[1] < hitbox[3] && // Parte superior de jokalaria está dentro del rango vertical de kolisioa
+        jokalaria.hitbox[3] > hitbox[1])   // Parte inferior de jokalaria está dentro del rango vertical de kolisioa
+    {
+        k = 1; // Colisión en el lado izquierdo
+    }
+
+    return k;
+}
+
+POSIZIOA paretakinTalka(JOKO_ELEMENTUA jokalaria, POSIZIOA abiadura)
+{
+    // datos de las paredes del 3er nibel
+    int hitbox[4][4];
+    hitbox[0][0] = 0;
+    hitbox[0][1] = -50;
+    hitbox[0][2] = 1000;
+    hitbox[0][3] = -20;
+
+    hitbox[1][0] = -5;
+    hitbox[1][1] = 0;
+    hitbox[1][2] = 0;
+    hitbox[1][3] = 700;
+
+    // derecha
+    hitbox[2][0] = 1000;
+    hitbox[2][1] = 0;
+    hitbox[2][2] = 1005;
+    hitbox[2][3] = 700;
+
+    // abajo
+    hitbox[3][0] = 0;
+    hitbox[3][1] = 700;
+    hitbox[3][2] = 1000;
+    hitbox[3][3] = 705;
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (jokalaria.hitbox[0] + abiadura.x < hitbox[i][2] && jokalaria.hitbox[1] < hitbox[i][3] &&
+            jokalaria.hitbox[2] + abiadura.x > hitbox[i][0] && jokalaria.hitbox[3] > hitbox[i][1])
+        {
+            abiadura.x = 0;
+        }
+        else if (jokalaria.hitbox[0] < hitbox[i][2] && jokalaria.hitbox[1] + abiadura.y < hitbox[i][3] &&
+                 jokalaria.hitbox[2] > hitbox[i][0] && jokalaria.hitbox[3] + abiadura.y > hitbox[i][1])
+        {
+            abiadura.y = 0;
+        }
+    }
+
+    return abiadura;
+}
+
+int objetuakKargatu(int irudia)
+{
+    int id;
+    switch (irudia)
+    {
+    case 5:
+            id = irudiaKargatu("./img/kanaberaX2.bmp");
+            break;
+        case 19:
+            id = irudiaKargatu("./img/bolsa_gris.bmp");
+            break;
+        case 20:
+            id = irudiaKargatu("./img/bolsa_amarilla.bmp");
+            break;
+        case 21:
+            id = irudiaKargatu("./img/jager.bmp");
+            break;
+        case 22:
+            id = irudiaKargatu("./img/licor.bmp");
+            break;
+        case 23:
+            id = irudiaKargatu("./img/cocacola.bmp");
+            break;
+        case 24:
+            id = irudiaKargatu("./img/cigarros.bmp");
+            break;
+        case 103:
+            id = irudiaKargatu("./img/suelo_1.bmp");
+            break;
+        case 104:
+            id = irudiaKargatu("./img/suelo_2.bmp");
+            break;
+        case 105:
+            id = irudiaKargatu("./img/suelo_3.bmp");
+            break;
+        case 106:
+            id = irudiaKargatu("./img/suelo_4.bmp");
+            break;
+        case 107:
+            id = irudiaKargatu("./img/suelo_5.bmp");
+            break;
+        case 108:
+            id = irudiaKargatu("./img/suelo_futbol.bmp");
+            break;
+    default:
+        break;
+    return id;
+    }
+}
+
+GLOBOAK globoaBota(GLOBOAK globoak, JOKO_ELEMENTUA jokalaria, POSIZIOA pantaila)
+{
+    int modulua;
+    float moduluaf;
+    POSIZIOA sagua;
+    sagua = saguarenPosizioa();
+    sagua.x+=7+pantaila.x;
+    sagua.y+=9+pantaila.y;
+    globoak.abiadura[globoak.zenbagarrena].x=sagua.x-jokalaria.pos.x-25;
+    globoak.abiadura[globoak.zenbagarrena].y=sagua.y-jokalaria.pos.y-36;
+    modulua=globoak.abiadura[globoak.zenbagarrena].x*globoak.abiadura[globoak.zenbagarrena].x+
+            globoak.abiadura[globoak.zenbagarrena].y*globoak.abiadura[globoak.zenbagarrena].y;
+    moduluaf=(float)modulua;
+    moduluaf=sqrt(moduluaf)/10;
+    modulua=(int)moduluaf;
+    globoak.abiadura[globoak.zenbagarrena].x/=modulua;
+    globoak.abiadura[globoak.zenbagarrena].y/=modulua;
+    globoak.posizioa[globoak.zenbagarrena].x=jokalaria.pos.x+25;
+    globoak.posizioa[globoak.zenbagarrena].y=jokalaria.pos.y+36;
+    globoak.zenbagarrena++;
+    if (globoak.zenbagarrena==10)
+    {
+        globoak.zenbagarrena=0;
+    }
+    return globoak;
+}
+
+int irudiaOndoKargatu(char *fileName)
+{
+    int irudia;
+    irudia = irudiaKargatu("./img/irudia.bmp");
+    if (irudia==-1)
+    {
+        irudiaKendu(irudia);
+        irudia = irudiaKargatu(fileName);
+    } 
+    return irudia;
+}
+
+int irudiakKargatu(int irudia)
+{
+    int id;
+    switch (irudia)
+    {
+    case 1:
+        id = irudiaKargatu("./img/arboles_1.bmp");
+        break;
+    case 2:
+        id = irudiaKargatu("./img/arboles_2.bmp");
+        break;
+    case 3:
+        id = irudiaKargatu("./img/rio_1.bmp");
+        break;
+    case 4:
+        id = irudiaKargatu("./img/coche.bmp");
+        break;
+    case 6:
+        id = irudiaKargatu("./img/arboles_5.bmp");
+        break;
+    case 7:
+        id = irudiaKargatu("./img/arboles_4.bmp");
+        break;
+    case 8:
+        id = irudiaKargatu("./img/arbusto.bmp");
+        break;
+    case 9:
+        id = irudiaKargatu("./img/arbol_1.bmp");
+        break;
+    case 10:
+        id = irudiaKargatu("./img/arbol_2.bmp");
+        break;
+    case 11:
+        id = irudiaKargatu("./img/mesa.bmp");
+        break;
+    case 12:
+        id = irudiaKargatu("./img/banco.bmp");
+        break;
+    case 13:
+        id = irudiaKargatu("./img/farola.bmp");
+        break;
+    case 14:
+        id = irudiaKargatu("./img/columpio.bmp");
+        break;
+    case 15:
+        id = irudiaKargatu("./img/tobogan.bmp");
+        break;
+    case 16:
+        id = irudiaKargatu("./img/fuente.bmp");
+        break;
+    case 17:
+        id = irudiaKargatu("./img/arboles_1.bmp");
+        break;
+    case 18:
+        id = irudiaKargatu("./img/arboles_3.bmp");
+        break;
+    case 25:
+        id = irudiaKargatu("./img/arbol_quemado_1.bmp");
+        break;
+    case 26:
+        id = irudiaKargatu("./img/arbol_quemado_2.bmp");
+        break;
+    case 27:
+        id = irudiaKargatu("./img/tronco_quemado.bmp");
+        break;
+    case 28:
+        id = irudiaKargatu("./img/tronco_quemandose.bmp");
+        break;
+    case 29:
+        id = irudiaKargatu("./img/rio_2.bmp");
+        break;
+    case 30:
+        id = irudiaKargatu("./img/cigarros.bmp");
+        break;
+    case 31:
+        id = irudiaKargatu("./img/cigarros.bmp");
+        break;
+    case 32:
+        id = irudiaKargatu("./img/arboles_quemandose_3.bmp");
+        break;
+    case 33:
+        id = irudiaKargatu("./img/arboles_quemandose_1.bmp");
+        break;
+    case 34:
+        id = irudiaKargatu("./img/arboles_quemandose_2.bmp");
+        break;
+    case 35:
+        id = irudiaKargatu("./img/arboles_quemandose_2.bmp");
+        break;
+    case 36:
+        id = irudiaKargatu("./img/estitxu.bmp");
+        break;
+    case 37:
+        id = irudiaKargatu("./img/pollo.bmp");
+        break;
+    default:
+        break;
+    }
+    return id;
+}
+
 int interfazaKargatu(inventario invent)
 {
-    irudiaMugitu(invent.argazkiak[0], 425, 650);
-    irudiaMugitu(invent.argazkiak[1], 422 + invent.posizioa * 30, 647);
+    int i;
+    irudiaMugitu(invent.argazkiak[0],425,650);
+    irudiaMugitu(invent.argazkiak[1],422+invent.posizioa*30,647);
+    for (i = 0; i < 5; i++)
+    {
+        switch (invent.objetuak[i])
+        {
+        case KANABERA:
+            irudiaMugitu(invent.argazkiak[2],433+i*30,658);
+            break;
+        case UR_GLOBOA:
+            irudiaMugitu(invent.argazkiak[3],433+i*30,658);
+            break;
+        default:
+            break;
+        }
+        
+    }
     return 0;
+}
+
+partidako_data inbentarioaKargatu(partidako_data partida)
+{   
+    partida.invent.argazkiak[0] = irudiaKargatu("./img/inventario.bmp");
+    if (partida.invent.argazkiak[0]==-1)
+    {
+        irudiaKendu(partida.invent.argazkiak[0]);
+        partida.invent.argazkiak[0] = irudiaKargatu("./img/inventario.bmp");
+    }  
+    partida.invent.argazkiak[1] = irudiaKargatu("./img/casilla.bmp");
+    if (partida.invent.argazkiak[1]==-1)
+    {
+        irudiaKendu(partida.invent.argazkiak[0]);
+        partida.invent.argazkiak[1] = irudiaKargatu("./img/casilla.bmp");
+    }  
+    partida.invent.argazkiak[2] = irudiaKargatu("./img/kanabera.bmp");
+    if (partida.invent.argazkiak[2]==-1)
+    {
+        irudiaKendu(partida.invent.argazkiak[0]);
+        partida.invent.argazkiak[2] = irudiaKargatu("./img/kanabera.bmp");
+    }  
+    irudiaMugitu(partida.invent.argazkiak[2],-1000,-1000);
+    partida.invent.argazkiak[3] = irudiaKargatu("./img/globo.bmp");
+    if (partida.invent.argazkiak[3]==-1)
+    {
+        irudiaKendu(partida.invent.argazkiak[0]);
+        partida.invent.argazkiak[3] = irudiaKargatu("./img/globo.bmp");
+    }  
+    irudiaMugitu(partida.invent.argazkiak[3],-1000,-1000);
+    return partida;
+}
+
+GLOBOAK globoakKargatu()
+{
+    int i;
+    GLOBOAK globoak;
+    for (i = 0; i < 10; i++)
+    {
+        globoak.id[i]=irudiaKargatu("./img/globo.bmp");
+        globoak.abiadura[i].x=0;
+        globoak.abiadura[i].y=0;
+        globoak.posizioa[i].x=-2000;
+        globoak.posizioa[i].y=-2000;
+    }
+    globoak.zenbagarrena=0;
+    return globoak;
 }
 
 void pausaBotoia()
@@ -101,6 +453,78 @@ JOKO_ELEMENTUA jokalariaMugitu(JOKO_ELEMENTUA jokalaria, POSIZIOA abiadura)
     return jokalaria;
 }
 
+int txokatuAlDira(JOKO_ELEMENTUA jokalaria, JOKO_ELEMENTUA kolisioa)
+{
+    int k = 0;
+    if (jokalaria.hitbox[0] < kolisioa.hitbox[2] && jokalaria.hitbox[1] < kolisioa.hitbox[3] &&
+        jokalaria.hitbox[2] > kolisioa.hitbox[0] && jokalaria.hitbox[3] > kolisioa.hitbox[1])
+    {
+        k = 1;
+    }
+    return k;
+}
+
+POSIZIOA txokatuAlDiraKolisioa(JOKO_ELEMENTUA jokalaria, JOKO_ELEMENTUA kolisioa, POSIZIOA abiadura)
+{
+    if (kolisioa.mota == KOLISIOA)
+    {
+        if (jokalaria.hitbox[0] + abiadura.x < kolisioa.hitbox[2] && jokalaria.hitbox[1] < kolisioa.hitbox[3] &&
+            jokalaria.hitbox[2] + abiadura.x > kolisioa.hitbox[0] && jokalaria.hitbox[3] > kolisioa.hitbox[1])
+        {
+            abiadura.x = 0;
+        }
+        else if (jokalaria.hitbox[0] < kolisioa.hitbox[2] && jokalaria.hitbox[1] + abiadura.y < kolisioa.hitbox[3] &&
+                jokalaria.hitbox[2] > kolisioa.hitbox[0] && jokalaria.hitbox[3] + abiadura.y > kolisioa.hitbox[1])
+        {
+            abiadura.y = 0;
+        }
+    }
+    return abiadura;
+}
+
+partidako_data eremuaEgin(partidako_data partida, int eremu_id, JOKO_ELEMENTUA jokalaria)
+{
+    switch (eremu_id)
+        {
+        case 0:
+            partida.nibel = 1;
+            partida.jokalaria.x = 4950;
+            partida.jokalaria.y = jokalaria.pos.y + 3000;
+            break;
+        case 1:
+            partida.nibel = 0;
+            partida.jokalaria.x = 5;
+            partida.jokalaria.y = jokalaria.pos.y - 3000;
+            break;
+        case 2:
+            partida.nibel = 2;
+            partida.jokalaria.x = 2950;
+            partida.jokalaria.y = jokalaria.pos.y - 4400;
+            break;
+        case 3:
+            partida.nibel = 1;
+            partida.jokalaria.x = 10;
+            partida.jokalaria.y = jokalaria.pos.y + 4400;
+            break;
+        case 4:
+            partida.nibel = 6;
+            break;
+        case 5:
+            partida.nibel = 3;
+            partida.jokalaria.x = 1050;
+            partida.jokalaria.y = jokalaria.pos.y - 800;
+            break;
+        case 6:
+            partida.nibel = 2;
+            partida.jokalaria.x = 5;
+            partida.jokalaria.y = jokalaria.pos.y + 800;
+            break;
+        default:
+            break;
+        }
+    return partida;
+}
+
 int txokatuAlDiraPareta(JOKO_ELEMENTUA jokalaria, JOKO_ELEMENTUA kolisioa)
 {
     int k = 0;
@@ -122,122 +546,6 @@ int txokatuAlDiraPareta(JOKO_ELEMENTUA jokalaria, JOKO_ELEMENTUA kolisioa)
     }
 
     return k;
-}
-
-int txokatuAlDira(JOKO_ELEMENTUA jokalaria, JOKO_ELEMENTUA kolisioa)
-{
-    int k = 0;
-    if (jokalaria.hitbox[0] < kolisioa.hitbox[2] && jokalaria.hitbox[1] < kolisioa.hitbox[3] &&
-        jokalaria.hitbox[2] > kolisioa.hitbox[0] && jokalaria.hitbox[3] > kolisioa.hitbox[1])
-    {
-        k = 1;
-    }
-    return k;
-}
-
-POSIZIOA txokatuAlDiraKolisioa(JOKO_ELEMENTUA jokalaria, JOKO_ELEMENTUA kolisioa, POSIZIOA abiadura)
-{
-    if (jokalaria.hitbox[0] + abiadura.x < kolisioa.hitbox[2] && jokalaria.hitbox[1] < kolisioa.hitbox[3] &&
-        jokalaria.hitbox[2] + abiadura.x > kolisioa.hitbox[0] && jokalaria.hitbox[3] > kolisioa.hitbox[1])
-    {
-        abiadura.x = 0;
-    }
-    else if (jokalaria.hitbox[0] < kolisioa.hitbox[2] && jokalaria.hitbox[1] + abiadura.y < kolisioa.hitbox[3] &&
-             jokalaria.hitbox[2] > kolisioa.hitbox[0] && jokalaria.hitbox[3] + abiadura.y > kolisioa.hitbox[1])
-    {
-        abiadura.y = 0;
-    }
-    return abiadura;
-}
-
-POSIZIOA paretakinTalka(JOKO_ELEMENTUA jokalaria, POSIZIOA abiadura)
-{
-    // datos de las paredes del 3er nibel
-    int hitbox[4][4];
-    hitbox[0][0] = 0;
-    hitbox[0][1] = -50;
-    hitbox[0][2] = 1000;
-    hitbox[0][3] = -20;
-
-    hitbox[1][0] = -5;
-    hitbox[1][1] = 0;
-    hitbox[1][2] = 0;
-    hitbox[1][3] = 700;
-
-    // derecha
-    hitbox[2][0] = 1000;
-    hitbox[2][1] = 0;
-    hitbox[2][2] = 1005;
-    hitbox[2][3] = 700;
-
-    // abajo
-    hitbox[3][0] = 0;
-    hitbox[3][1] = 700;
-    hitbox[3][2] = 1000;
-    hitbox[3][3] = 705;
-
-    for (int i = 0; i < 4; i++)
-    {
-        if (jokalaria.hitbox[0] + abiadura.x < hitbox[i][2] && jokalaria.hitbox[1] < hitbox[i][3] &&
-            jokalaria.hitbox[2] + abiadura.x > hitbox[i][0] && jokalaria.hitbox[3] > hitbox[i][1])
-        {
-            abiadura.x = 0;
-        }
-        else if (jokalaria.hitbox[0] < hitbox[i][2] && jokalaria.hitbox[1] + abiadura.y < hitbox[i][3] &&
-                 jokalaria.hitbox[2] > hitbox[i][0] && jokalaria.hitbox[3] + abiadura.y > hitbox[i][1])
-        {
-            abiadura.y = 0;
-        }
-    }
-
-    return abiadura;
-}
-
-int paretakinTalkaEskubi(JOKO_ELEMENTUA jokalaria)
-{
-    int hitbox[4], k = 0;
-    // derecha
-    hitbox[0] = 1000;
-    hitbox[1] = 0;
-    hitbox[2] = 1100;
-    hitbox[3] = 700;
-
-    if (jokalaria.hitbox[0] < hitbox[2] && // Izquierda de jokalaria está dentro del rango horizontal de kolisioa
-        jokalaria.hitbox[0] > hitbox[0] && // Izquierda de jokalaria no está fuera por la izquierda de kolisioa
-        jokalaria.hitbox[1] < hitbox[3] && // Parte superior de jokalaria está dentro del rango vertical de kolisioa
-        jokalaria.hitbox[3] > hitbox[1])   // Parte inferior de jokalaria está dentro del rango vertical de kolisioa
-    {
-        k = 1; // Colisión en el lado izquierdo
-    }
-
-    return k;
-}
-
-partidako_data eremuaEgin(partidako_data partida, int eremu_id, JOKO_ELEMENTUA jokalaria)
-{
-    switch (eremu_id)
-    {
-    case 0:
-        partida.nibel = 1;
-        partida.jokalaria.x = 4950;
-        partida.jokalaria.y = jokalaria.pos.y + 3000;
-        break;
-    case 1:
-        partida.nibel = 0;
-        partida.jokalaria.x = 5;
-        partida.jokalaria.y = jokalaria.pos.y - 3000;
-        break;
-
-    case 3:
-        partida.nibel = 4;
-        partida.jokalaria.x = 450;
-        partida.jokalaria.y = 30;
-        jokalaria.norabidea = 4;
-        break;
-    default:
-        break;
-    }
-    return partida;
 }
 
 POSIZIOA pantailaMugitu(POSIZIOA pantaila, POSIZIOA limiteak, POSIZIOA jokalaria, POSIZIOA abiadura)
@@ -264,4 +572,69 @@ JOKO_ELEMENTUA irudiaKanporatu(JOKO_ELEMENTUA elementua)
     elementua.hitbox[2] = -1000;
     elementua.hitbox[3] = -1000;
     return elementua;
+}
+
+nibela objetuakKanporatu(partidako_data partida, nibela mapa)
+{
+    int i;
+    for (i = 0; i < mapa.kantitatea; i++)
+    {
+        if (mapa.elementuak[i].mota==OBJETUA)
+        {
+            if (partida.objetuak[mapa.elementuak[i].objetu_id]==1)
+            {
+                mapa.elementuak[i]=irudiaKanporatu(mapa.elementuak[i]);
+            }
+        }
+    }
+    return mapa;
+}
+
+void irudiakKendu(nibela mapa)
+{
+    int i;
+    for (i = 0; i < mapa.kantitatea; i++)
+    {
+        irudiaKendu(mapa.elementuak[i].id);
+    }
+}
+
+partidako_data kolisioak(partidako_data partida, nibela mapa)
+{
+    int i,txokea;
+    for (i = 0; i < mapa.kantitatea; i++)
+    {
+        partida.abiadura = txokatuAlDiraKolisioa(mapa.elementuak[0], mapa.elementuak[i], partida.abiadura);
+        txokea = txokatuAlDira(mapa.elementuak[0], mapa.elementuak[i]);
+        if (mapa.elementuak[i].mota == EREMUA && txokea == 1)
+        {
+            partida = eremuaEgin(partida, mapa.elementuak[i].eremu_id, mapa.elementuak[0]);
+        }
+    }
+    return partida;
+}
+
+partidako_data objetuak(partidako_data partida, nibela mapa)
+{
+    int i, txokea;
+    for (i = 0; i < mapa.kantitatea; i++)
+    {
+        txokea = txokatuAlDira(mapa.elementuak[0],mapa.elementuak[i]);
+        if (mapa.elementuak[i].mota == OBJETUA&&txokea==1)
+        {
+            mapa.elementuak[i]=irudiaKanporatu(mapa.elementuak[i]);
+            irudiaMugitu(mapa.elementuak[i].id, mapa.elementuak[i].pos.x, mapa.elementuak[i].pos.y);
+            partida.objetuak[mapa.elementuak[i].objetu_id]=1;
+            if (mapa.elementuak[i].objetu_id==0)
+            {
+                partida=objetuaGehitu(partida,KANABERA);
+            }
+            else if (mapa.elementuak[i].objetu_id==41)
+            {
+                partida=objetuaGehitu(partida,UR_GLOBOA);
+            }                    
+            break;
+        }
+    }
+    return partida;
 }

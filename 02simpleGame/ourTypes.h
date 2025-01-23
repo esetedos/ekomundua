@@ -36,9 +36,18 @@ typedef struct
     IRUDIA irudi_data;
     NEURRIAK neurriak;
     POSIZIOA abiadura;
-    Uint32 mugimendua;
+    Uint32 mugimendua; //timer
     int hartuId;
 } JOKO_ELEMENTUA;
+
+typedef struct
+{
+    int id[10];
+    POSIZIOA posizioa[10];
+    POSIZIOA abiadura[10];
+    int zenbagarrena;
+}GLOBOAK;
+
 
 typedef struct
 {
@@ -62,16 +71,17 @@ typedef struct
     int posizioa;
     OBJETUAK objetuak[5];
     int kantitatea[5];
-    int argazkiak[7];
+    int argazkiak[4];
 } inventario;
 
 typedef struct
 {
     int nibel;
+    POSIZIOA abiadura;
     POSIZIOA jokalaria;
     int objetuak[50];
-    int objetu_kantitatea[3];
     inventario invent;
+    int zaborra;
 } partidako_data;
 
 #endif
