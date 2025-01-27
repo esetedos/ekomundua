@@ -117,8 +117,9 @@ partidako_data jokatu(partidako_data partida)
     // inicio de juego (niveles)
     nibela mapa;
     POSIZIOA pantaila;
-    int ebentu = 0, i, j, egoera, pausa, txokea, zaborra = 0;
+    int ebentu = 0, i, j, egoera, pausa, txokea, zaborra = 0, k = 0, eskubira = 0;
     GLOBOAK globoak;
+    Mix_Music *musika = Mix_LoadWAV("./sound/defentsa.wav");
 
     arkatzKoloreaEzarri(0, 0, 255);
     // inicalizar datos principales del nivel
@@ -187,6 +188,7 @@ partidako_data jokatu(partidako_data partida)
         case 110:
             mapa.elementuak[i].id = irudiaKargatu("./img/suelo_7.bmp");
             break;
+
         default:
             break;
         }
@@ -300,8 +302,18 @@ partidako_data jokatu(partidako_data partida)
         case 41:
             mapa.elementuak[i].id = irudiaKargatu("./img/pez.bmp");
             break;
+        case 111:
+            mapa.elementuak[i].id = irudiaKargatu("./img/irudia.bmp");
+            break;
         default:
             break;
+        }
+    }
+    for (i = 1; i < mapa.kantitatea; i++)
+    {
+        if (mapa.elementuak[k].irudia == 111)
+        {
+            mapa.elementuak[i].id = irudiaKargatu("./img/irudia.bmp");
         }
     }
 
@@ -445,6 +457,22 @@ partidako_data jokatu(partidako_data partida)
                 }
             }
             break;
+        case TECLA_l:
+            for (k = 0; k < mapa.kantitatea; k++)
+            {
+                if (mapa.elementuak[k].irudia == 111)
+                {
+                    mapa.elementuak[k].abiadura.x = -15;
+                    if (mapa.elementuak[k].pos.x < 0)
+                    {
+                        eskubira = 1;
+                        // Mix_PlayChannel(0, musika, 0);
+                    }
+                }
+            }
+            // Mix_PlayMusic(musika, -1);
+
+            break;
         default:
             break;
         }
@@ -525,6 +553,22 @@ partidako_data jokatu(partidako_data partida)
             partida.nibel = 0;
             partida.jokalaria.x = 475;
             partida.jokalaria.y = 1820;
+        }
+        for (k = 0; k < mapa.kantitatea; k++)
+        {
+            if (mapa.elementuak[k].irudia == 111)
+            {
+                if (eskubira)
+                {
+                    mapa.elementuak[k].pos.x -= mapa.elementuak[k].abiadura.x;
+                }
+                else
+                {
+                    mapa.elementuak[k].pos.x += mapa.elementuak[k].abiadura.x;
+                }
+
+                mapa.elementuak[k].abiadura.x = 0;
+            }
         }
 
         pantaila = pantailaMugitu(pantaila, mapa.limiteak, mapa.elementuak[0].pos, partida.abiadura);

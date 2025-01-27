@@ -25,7 +25,7 @@ int main(int argc, char *str[])
     {
         partida = jokatu(partida);
     }
-    if (partida.nibel!=10)
+    if (partida.nibel != 10)
     {
         jokoaBukatu(partida);
     }

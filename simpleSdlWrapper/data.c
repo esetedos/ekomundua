@@ -83,8 +83,7 @@ nibela dataKargatu(int nibel)
                     break;
                 case 3:
                     mapa.elementuak[j].mota = OBJETUA;
-                    mapa.elementuak[j].abiadura.x =
-                        3 + rand() % (6 - 3 + 1); // número aleatorio entre 3 y 6, ambos incluídos
+                    mapa.elementuak[j].abiadura.x = 0; // número aleatorio entre 3 y 6, ambos incluídos
                     mapa.elementuak[j].abiadura.y = 3 + rand() % (6 - 3 + 1); // no se usa en el 4to nivel
                     mapa.elementuak[j].mugimendua = 0; // timer para movimiento en el juego de pesca (nivel 4)
                     mapa.elementuak[j].hartuId = 0;    // elemento atrapado 4.nivel
