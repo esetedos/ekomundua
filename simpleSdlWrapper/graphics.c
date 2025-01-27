@@ -57,8 +57,8 @@ void karratuaMarraztu(int x1, int y1, int x2, int y2)
     zuzenaMarraztu(x2, y1, x1, y1);
 }
 
-int irudiaMarraztuPorTamano(SDL_Texture *texture, SDL_Rect *pDest, int frame, int margen, int width, int height,
-                            int jokalariarenNorabidea)
+int irudiaMarraztuPorTamanoPersonaje(SDL_Texture *texture, SDL_Rect *pDest, int frame, int margen, int width,
+                                     int height, int jokalariarenNorabidea)
 {
     SDL_Rect src;
 
@@ -74,6 +74,24 @@ int irudiaMarraztuPorTamano(SDL_Texture *texture, SDL_Rect *pDest, int frame, in
 
     src.w = (width == 0) ? pDest->w : width;
     src.h = (height == 0) ? pDest->h : height;
+
+    pDest->w = src.w;
+    pDest->h = src.h;
+
+    SDL_RenderCopy(gRenderer, texture, &src, pDest);
+    return 0;
+}
+
+int irudiaMarraztuPorTamano(SDL_Texture *texture, SDL_Rect *pDest, int margen, int width, int height, int norabidea)
+{
+    SDL_Rect src;
+
+    // para que pille la imagen empezando de 0 (si el frame es 0), y si no que pille lo que sería al siguiente frame
+    src.x = margen;
+    src.y = (margen + height) * norabidea;
+
+    src.w = width;
+    src.h = height;
 
     pDest->w = src.w;
     pDest->h = src.h;

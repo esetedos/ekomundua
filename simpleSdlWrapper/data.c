@@ -40,7 +40,14 @@ nibela dataKargatu(int nibel)
     fgets(caracteres, 100, archivo);
     sscanf(caracteres, "%d", &zenbakia);
     mapa.limiteak.y = zenbakia;
-
+    // se ejecuta cuando los datos los recogen de un txt y no del codigo
+    // las primeras 3 lineas del txt son la cantidad de elementos y el tamaño del nivel
+    //  despues de eso van los datos de todos los elementos, cada vez que hay un -1 se empieza un nuevo elemento
+    // el primer dato es tipo de elemento
+    // el segundo dato es la imagen, a menos de que se un tipo Eremu, en cuyo caso es su eremu_id
+    // del tercer al sexto dato son la hitbox
+    // el septimo y el octavo son la posicion de la imagen
+    // el octavo es el objetu_id
     while (feof(archivo) == 0)
     {
         fgets(caracteres, 100, archivo);
@@ -59,6 +66,7 @@ nibela dataKargatu(int nibel)
                 {
                 case 0:
                     mapa.elementuak[j].mota = PERTSONAIA;
+                    // datos a colocar a mano sobre las proporciones del personaje (para animaciones)
                     mapa.elementuak[j].neurriak.width = 51;
                     mapa.elementuak[j].neurriak.height = 72; // 68;
                     mapa.elementuak[j].irudi_data.frame = 0;
@@ -78,8 +86,8 @@ nibela dataKargatu(int nibel)
                     mapa.elementuak[j].abiadura.x =
                         3 + rand() % (6 - 3 + 1); // número aleatorio entre 3 y 6, ambos incluídos
                     mapa.elementuak[j].abiadura.y = 3 + rand() % (6 - 3 + 1); // no se usa en el 4to nivel
-                    mapa.elementuak[j].mugimendua = 0;
-                    mapa.elementuak[j].hartuId = 0; // elemento atrapado 4.nivel
+                    mapa.elementuak[j].mugimendua = 0; // timer para movimiento en el juego de pesca (nivel 4)
+                    mapa.elementuak[j].hartuId = 0;    // elemento atrapado 4.nivel
 
                     break;
                 default:
@@ -94,6 +102,36 @@ nibela dataKargatu(int nibel)
                 else
                 {
                     mapa.elementuak[j].irudia = zenbakia;
+                    // elementos con fuego que tienen que ser apagados (para poder hacer su animacion)
+                    switch (zenbakia)
+                    {
+                    case 28:
+                        mapa.elementuak[j].neurriak.width = 64;
+                        mapa.elementuak[j].neurriak.height = 46;
+                        mapa.elementuak[j].irudi_data.frame = 0;
+                        mapa.elementuak[j].irudi_data.kantitatea = 1;
+                        mapa.elementuak[j].norabidea = 0;
+                        mapa.elementuak[j].irudi_data.margena = 0; // pixeles de margen entre fotograma
+                        break;
+                    case 25:
+                        mapa.elementuak[j].neurriak.width = 163;
+                        mapa.elementuak[j].neurriak.height = 310;
+                        mapa.elementuak[j].irudi_data.frame = 0;
+                        mapa.elementuak[j].irudi_data.kantitatea = 1;
+                        mapa.elementuak[j].norabidea = 0;
+                        mapa.elementuak[j].irudi_data.margena = 0;
+                        break;
+                    case 26:
+                        mapa.elementuak[j].neurriak.width = 167;
+                        mapa.elementuak[j].neurriak.height = 260;
+                        mapa.elementuak[j].irudi_data.frame = 0;
+                        mapa.elementuak[j].irudi_data.kantitatea = 1;
+                        mapa.elementuak[j].norabidea = 0;
+                        mapa.elementuak[j].irudi_data.margena = 0;
+                        break;
+                    default:
+                        break;
+                    }
                 }
                 break;
             case 2:
@@ -140,7 +178,8 @@ partidako_data partidakoDataKargatu()
 
     partida.abiadura.x = 0;
     partida.abiadura.y = 0;
-    partida.zaborra=0;
+    partida.zaborra = 0;
+    partida.sutea = 0;
 
     int i;
 

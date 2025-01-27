@@ -14,8 +14,9 @@ void karratuaMarraztu(int x1, int y1, int x2, int y2);
 void zirkuluaMarraztu(int x, int y, int r);
 void pantailaGarbitu();
 void pantailaBerriztu();
-int irudiaMarraztuPorTamano(SDL_Texture *texture, SDL_Rect *pDest, int frame, int margen, int width, int height,
-                            int jokalariarenNorabidea);
+int irudiaMarraztuPorTamanoPersonaje(SDL_Texture *texture, SDL_Rect *pDest, int frame, int margen, int width,
+                                     int height, int jokalariarenNorabidea);
+int irudiaMarraztuPorTamano(SDL_Texture *texture, SDL_Rect *pDest, int margen, int width, int height, int norabidea);
 
 int irudiaMarraztu(SDL_Texture *texture, SDL_Rect *pDest);
 

@@ -9,7 +9,7 @@
 #include "text.h"
 #include <stdio.h>
 
-void pausaBotoia();
+int pausaBotoia(int nibel);
 int irudiaOndoKargatu(char *fileName);
 int txokatuAlDiraPareta(JOKO_ELEMENTUA jokalaria, JOKO_ELEMENTUA kolisioa);
 int paretakinTalkaEskubi(JOKO_ELEMENTUA jokalaria);

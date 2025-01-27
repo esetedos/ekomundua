@@ -18,11 +18,13 @@ void jokoaAurkeztu(void)
     POSIZIOA sagua;
 
     pantailaGarbitu();
+    // fondoak kargatu
     idfondo = irudiaKargatu("./img/Menu.bmp");
     idboton = irudiaKargatu("./img/Hasi.bmp");
     idboton2 = irudiaKargatu("./img/hasi_handia.bmp");
     irudiaMugitu(idboton, 400, 400);
     irudiaMugitu(idboton2, -400, -400);
+    // pantalla principal
     while (hasi == 1)
     {
         pantailaBerriztu();
@@ -30,6 +32,7 @@ void jokoaAurkeztu(void)
         irudiaMugitu(idboton2, -400, -400);
         ebentu = ebentuaJasoGertatuBada();
         sagua = saguarenPosizioa();
+        // animacion boton hasi
         if (sagua.x > 400 && sagua.x < 600 && sagua.y > 400 && sagua.y < 460)
         {
             irudiaMugitu(idboton2, 375, 385);
@@ -39,6 +42,7 @@ void jokoaAurkeztu(void)
             }
         }
     }
+    // quitar fotos
     irudiaKendu(idfondo);
     irudiaKendu(idboton);
     irudiaKendu(idboton2);
@@ -46,18 +50,20 @@ void jokoaAurkeztu(void)
 
 void jokoaBukatu(partidako_data partida)
 {
-    int ebentu = 0, idfondo, idboton, idboton2, hasi = 1,k=0,l=0,i;
-    char j1[8],k1[8],l1[8];
+    int ebentu = 0, idfondo, idboton, idboton2, hasi = 1, i, kont = 0;
+    char zaborra_ura[8], zaborra[8], sutea[8];
+    // ceuenta cuantos objetos se han recogido para la puntuacion
     for (i = 1; i < 41; i++)
     {
-        if (partida.objetuak[i]==1)
+        if (partida.objetuak[i] == 1)
         {
-            k++;
+            kont++;
         }
     }
-    sprintf(j1,"%d",partida.zaborra);
-    sprintf(k1,"%d",k);
-    sprintf(l1,"%d",l);
+    // proyecta la puntuación
+    sprintf(zaborra_ura, "%d", partida.zaborra);
+    sprintf(zaborra, "%d", kont);
+    sprintf(sutea, "%d", partida.sutea);
     POSIZIOA sagua;
 
     pantailaGarbitu();
@@ -66,14 +72,15 @@ void jokoaBukatu(partidako_data partida)
     idboton2 = irudiaKargatu("./img/atera_grande.bmp");
     irudiaMugitu(idboton, 150, 550);
     irudiaMugitu(idboton2, -400, -400);
+    // jokuaren amaiera pantalla mantendu dadin (y que se actualice a tiempo)
     while (hasi == 1)
     {
-        textuaIdatzi(560,510,"Arrantzatutako zaborra");
-        textuaIdatzi(560,570,"Jasotako zaborra");
-        textuaIdatzi(560,630,"Itzalitako zuhaitzak");
-        textuaIdatzi(860,510,j1);
-        textuaIdatzi(860,570,k1);
-        textuaIdatzi(860,630,l1);
+        textuaIdatzi(560, 510, "Arrantzatutako zaborra");
+        textuaIdatzi(560, 570, "Jasotako zaborra");
+        textuaIdatzi(560, 630, "Itzalitako zuhaitzak");
+        textuaIdatzi(860, 510, zaborra_ura);
+        textuaIdatzi(860, 570, zaborra);
+        textuaIdatzi(860, 630, sutea);
         pantailaBerriztu();
         irudiakMarraztuMapa();
         irudiaMugitu(idboton2, -400, -400);
@@ -87,11 +94,10 @@ void jokoaBukatu(partidako_data partida)
                 hasi = 0;
             }
         }
-        if (ebentu==TECLA_ESCAPE)
+        if (ebentu == TECLA_ESCAPE)
         {
-            hasi=0;
+            hasi = 0;
         }
-        
     }
     irudiaKendu(idfondo);
     irudiaKendu(idboton);
@@ -100,6 +106,7 @@ void jokoaBukatu(partidako_data partida)
 
 int uploadFrame(JOKO_ELEMENTUA *elem)
 {
+    // actualiza el frame para la animación (personaje principal)
     elem->irudi_data.frame =
         (elem->irudi_data.frame++ >= elem->irudi_data.kantitatea - 1) ? 0 : elem->irudi_data.frame++;
     return elem->irudi_data.frame;
@@ -107,13 +114,14 @@ int uploadFrame(JOKO_ELEMENTUA *elem)
 
 partidako_data jokatu(partidako_data partida)
 {
+    // inicio de juego (niveles)
     nibela mapa;
     POSIZIOA pantaila;
     int ebentu = 0, i, j, egoera, pausa, txokea, zaborra = 0;
     GLOBOAK globoak;
 
     arkatzKoloreaEzarri(0, 0, 255);
-
+    // inicalizar datos principales del nivel
     mapa = dataKargatu(partida.nibel);
     egoera = partida.nibel;
     mapa.elementuak[0].pos.x = partida.jokalaria.x;
@@ -128,8 +136,10 @@ partidako_data jokatu(partidako_data partida)
     Uint32 tiempoActual = SDL_GetTicks();
     pantaila = pantailaEgokitu(partida, mapa.limiteak);
     mapa.elementuak[mapa.kantitatea - 1].id = fondoaKargatu(mapa.elementuak[mapa.kantitatea - 1].irudia);
+    // cargar imagenes
     for (i = 1; i < mapa.kantitatea; i++)
     {
+        // objetos
         switch (mapa.elementuak[i].irudia)
         {
         case 5:
@@ -181,9 +191,11 @@ partidako_data jokatu(partidako_data partida)
             break;
         }
     }
+    // pertsonaia
     mapa.elementuak[0].id = irudiaKargatu("./img/pertsonaia.bmp");
     for (i = 1; i < mapa.kantitatea; i++)
     {
+        // besteak (elementuak eta kolisioak)
         switch (mapa.elementuak[i].irudia)
         {
         case 1:
@@ -253,7 +265,7 @@ partidako_data jokatu(partidako_data partida)
             mapa.elementuak[i].id = irudiaKargatu("./img/rio_2.bmp");
             break;
         case 30:
-            mapa.elementuak[i].id = irudiaKargatu("./img/cigarros.bmp");
+            mapa.elementuak[i].id = irudiaKargatu("./img/giroagua.bmp");
             break;
         case 31:
             mapa.elementuak[i].id = irudiaKargatu("./img/cubo.bmp");
@@ -294,20 +306,23 @@ partidako_data jokatu(partidako_data partida)
     }
 
     globoak = globoakKargatu();
+    // pantalla pausa kargatu
     pausa = irudiaKargatu("./img/pausa.bmp");
-    if (pausa==-1)
+    if (pausa == -1)
     {
         irudiaKendu(pausa);
         pausa = irudiaKargatu("./img/pausa.bmp");
-    } 
+    }
     irudiaMugitu(pausa, -1000, -1000);
+    // inbentarioa kargatu
     partida = inbentarioaKargatu(partida);
-
+    // nivel de pesca para que el personaje cambie a anzuelo
     if (partida.nibel == 4)
     {
         mapa.elementuak[0].norabidea = 4;
     }
 
+    // bucle principal juego
     do
     {
         SDL_Delay(10);
@@ -318,7 +333,9 @@ partidako_data jokatu(partidako_data partida)
         {
         case TECLA_LEFT:
             partida.abiadura.x = -5;
+            // if esto true, ?esto. si es false, es lo que está despues del :
             mapa.elementuak[0].norabidea = (partida.nibel == 4) ? 4 : 2;
+            // si es nivel 4 (pesca) que no cambie de norabidea porque siempre es el anzuelo
 
             // Obtener el tiempo actual
             tiempoActual = SDL_GetTicks();
@@ -326,6 +343,7 @@ partidako_data jokatu(partidako_data partida)
             // Verificar si han pasado al menos 2 segundos desde la última animación
             if (tiempoActual - lastAnimationTimer >= 100)
             {
+                // actualizar animacion (frame)
                 mapa.elementuak[0].irudi_data.frame = uploadFrame(&mapa.elementuak[0]);
                 lastAnimationTimer = tiempoActual;
             }
@@ -364,6 +382,7 @@ partidako_data jokatu(partidako_data partida)
             }
             break;
         case TECLA_LEFT_UP:
+            // personaje se queda quieto cuando no hay teclas pulsadas
             partida.abiadura.x = 0;
             mapa.elementuak[0].irudi_data.frame = 0;
             break;
@@ -380,9 +399,13 @@ partidako_data jokatu(partidako_data partida)
             mapa.elementuak[0].irudi_data.frame = 0;
             break;
         case TECLA_e:
-            // si hay dos objetos al alcance, recoge ambos a la vez
-            partida = objetuak(partida, mapa);
-            mapa = objetuakKanporatu(partida, mapa);
+            if (partida.nibel != 4)
+            {
+                // si hay dos objetos al alcance, recoge ambos a la vez
+                partida = objetuak(partida, mapa);
+                mapa = objetuakKanporatu(partida, mapa);
+            }
+
             break;
         case TECLA_1:
             partida.invent.posizioa = 0;
@@ -402,31 +425,33 @@ partidako_data jokatu(partidako_data partida)
         case TECLA_ESCAPE:
             irudiaMugitu(pausa, 150, 150);
             pantailaKargatu(mapa, pantaila, globoak);
-            pausaBotoia(pausa);
+            partida.nibel = pausaBotoia(partida.nibel);
             irudiaMugitu(pausa, -1000, -1000);
             pantailaKargatu(mapa, pantaila, globoak);
             break;
-         case SAGU_BOTOIA_EZKERRA:
-             if (partida.invent.objetuak[partida.invent.posizioa] == UR_GLOBOA)
-             {
-                 globoak = globoaBota(globoak, mapa.elementuak[0], pantaila);
-             }
-             else if (partida.invent.objetuak[partida.invent.posizioa] == KANABERA)
-             {
-                 if (partida.nibel==0&&mapa.elementuak[0].pos.y>1820)
-                 {
-                     partida.nibel=4;
-                     partida.jokalaria.x=475;
-                     partida.jokalaria.y=0;
-                 }
-             }
-             break;
+        case SAGU_BOTOIA_EZKERRA:
+            // para usar objeto del inventario
+            if (partida.invent.objetuak[partida.invent.posizioa] == UR_GLOBOA)
+            {
+                globoak = globoaBota(globoak, mapa.elementuak[0], pantaila);
+            }
+            else if (partida.invent.objetuak[partida.invent.posizioa] == KANABERA)
+            {
+                if (partida.nibel == 0 && mapa.elementuak[0].pos.y > 1820)
+                {
+                    partida.nibel = 4;
+                    partida.jokalaria.x = 475;
+                    partida.jokalaria.y = 0;
+                }
+            }
+            break;
         default:
             break;
         }
-
+        // calcula colisiones
         partida = kolisioak(partida, mapa);
 
+        // logica del nivel 4  (pesca)
         if (partida.nibel == 4)
         {
             // mapatik ez ateratzeko
@@ -471,9 +496,9 @@ partidako_data jokatu(partidako_data partida)
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[0] = mapa.elementuak[0].pos.x - 50;
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[1] = mapa.elementuak[0].pos.y + 20 + 20;
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[2] =
-                mapa.elementuak[0].pos.x - 50 + 150; // 150 = ancho imagen
+                    mapa.elementuak[0].pos.x - 50 + 150; // 150 = ancho imagen
                 mapa.elementuak[mapa.elementuak[0].hartuId].hitbox[3] =
-                mapa.elementuak[0].pos.y + 20 + 100 + 20; // 100 = alto imagen
+                    mapa.elementuak[0].pos.y + 20 + 100 + 20; // 100 = alto imagen
 
                 if (mapa.elementuak[0].pos.y < 0)
                 {
@@ -492,15 +517,15 @@ partidako_data jokatu(partidako_data partida)
         }
         else
         {
+            // si el nivel no es 4, que se quede sin sujetar ningun objeto
             mapa.elementuak[0].hartuId = -1;
         }
-        if (zaborra==10)
+        if (zaborra == 10)
         {
-            partida.nibel=0;
-            partida.jokalaria.x=475;
-            partida.jokalaria.y=1820;
+            partida.nibel = 0;
+            partida.jokalaria.x = 475;
+            partida.jokalaria.y = 1820;
         }
-        
 
         pantaila = pantailaMugitu(pantaila, mapa.limiteak, mapa.elementuak[0].pos, partida.abiadura);
         globoak = globoakMugitu(globoak);
@@ -519,6 +544,18 @@ partidako_data jokatu(partidako_data partida)
                         globoak.posizioa[i].y = -2000;
                         globoak.abiadura[i].x = 0;
                         globoak.abiadura[i].y = 0;
+                        // elementos con fuego que tienen que ser apagados: si recibel golpe de agua, cambio de
+                        // animacion
+                        if (mapa.elementuak[j].irudia == 28 || mapa.elementuak[j].irudia == 25 ||
+                            mapa.elementuak[j].irudia == 26)
+                        {
+                            if (mapa.elementuak[j].norabidea != 1)
+                            {
+                                partida.sutea++;
+                            }
+
+                            mapa.elementuak[j].norabidea = 1;
+                        }
                     }
                 }
             }

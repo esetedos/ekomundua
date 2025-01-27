@@ -82,6 +82,7 @@ typedef struct
     int objetuak[50];
     inventario invent;
     int zaborra;
+    int sutea;
 } partidako_data;
 
 #endif

@@ -92,9 +92,17 @@ void irudiakMarraztu(nibela mapa)
             {
                 if (mapa.elementuak[j].mota == PERTSONAIA)
                 {
-                    irudiaMarraztuPorTamano(irudiak[i].texture, &irudiak[i].dest, mapa.elementuak[0].irudi_data.frame,
-                                            mapa.elementuak[0].irudi_data.margena, mapa.elementuak[0].neurriak.width,
-                                            mapa.elementuak[0].neurriak.height, mapa.elementuak[0].norabidea);
+                    irudiaMarraztuPorTamanoPersonaje(
+                        irudiak[i].texture, &irudiak[i].dest, mapa.elementuak[0].irudi_data.frame,
+                        mapa.elementuak[0].irudi_data.margena, mapa.elementuak[0].neurriak.width,
+                        mapa.elementuak[0].neurriak.height, mapa.elementuak[0].norabidea);
+                }
+                else if (mapa.elementuak[j].irudia == 28 || mapa.elementuak[j].irudia == 25 ||
+                         mapa.elementuak[j].irudia == 26)
+                {
+                    irudiaMarraztuPorTamano(irudiak[i].texture, &irudiak[i].dest, mapa.elementuak[j].irudi_data.margena,
+                                            mapa.elementuak[j].neurriak.width, mapa.elementuak[j].neurriak.height,
+                                            mapa.elementuak[j].norabidea);
                 }
                 else
                 {
